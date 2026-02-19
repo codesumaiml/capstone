@@ -49,6 +49,18 @@ This project follows the CRISP-DM framework:
 - Feature engineering (BPM-duration index and intensity) improved interpretability of workout effort.
 - Tree-based models (Random Forest / Gradient Boosting) tended to perform better than simple linear models in this dataset, producing lower MSE and higher R² in held-out evaluation. Exact numeric results and model comparisons are available in the notebook `gym_member_exercise.ipynb`.
 
+Below are cross-validated results for models evaluated (CV_MSE reported as mean squared error on validation folds; CV_R2 is mean R²):
+
+| Model | CV_MSE | CV_R2 |
+|---|---:|---:|
+| GradientBoosting | 118.756340 | 0.998576 |
+| RandomForest | 484.346195 | 0.994194 |
+| Lasso | 829.172143 | 0.990061 |
+| LinearRegression | 829.202452 | 0.990061 |
+| Ridge | 853.381660 | 0.989771 |
+| KNN | 7468.796023 | 0.910473 |
+
+
 #### Next steps
 
 - Perform hyperparameter tuning (GridSearchCV or RandomizedSearchCV) for top models.
