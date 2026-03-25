@@ -45,9 +45,10 @@ This project follows the CRISP-DM framework:
 
 #### Results
 
-- Session duration and average BPM were identified as strong predictors of calories burned.
-- Feature engineering (BPM-duration index and intensity) improved interpretability of workout effort.
-- Tree-based models (Random Forest / Gradient Boosting) tended to perform better than simple linear models in this dataset, producing lower MSE and higher R² in held-out evaluation. Exact numeric results and model comparisons are available in the notebook `gym_member_exercise.ipynb`.
+- Session duration and average BPM emerged as the strongest drivers of `Calories_Burned`, and the engineered `BPM_Duration_Index` helped capture workout effort more directly.
+- Tree-based models clearly outperformed linear and distance-based baselines on this dataset.
+- `GradientBoostingRegressor` was the best overall untuned model, achieving `CV_MSE = 118.756` and `CV_R2 = 0.998576` on the held-out evaluation used in the notebook.
+- `RandomForestRegressor` was the next-best untuned model with `CV_MSE = 484.346` and `CV_R2 = 0.994194`, while `KNeighborsRegressor` lagged far behind with `CV_MSE = 7468.796` and `CV_R2 = 0.910473`.
 
 Below are cross-validated results for models evaluated (CV_MSE reported as mean squared error on validation folds; CV_R2 is mean R²):
 
@@ -55,15 +56,29 @@ Below are cross-validated results for models evaluated (CV_MSE reported as mean 
 |---|---:|---:|
 | GradientBoosting | 118.756340 | 0.998576 |
 | RandomForest | 484.346195 | 0.994194 |
+| DecisionTreeRegressor | 673.630769 | 0.991925 |
 | Lasso | 829.172143 | 0.990061 |
 | LinearRegression | 829.202452 | 0.990061 |
 | Ridge | 853.381660 | 0.989771 |
 | KNN | 7468.796023 | 0.910473 |
 
+Hyperparameter tuning was then applied to the top tree-based candidates:
+
+| Tuned Model | Tuned_CV_MSE | Tuned_CV_R2 | Best Parameters |
+|---|---:|---:|---|
+| GradientBoosting | 179.832458 | 0.997436 | `learning_rate=0.1`, `max_depth=3`, `min_samples_split=2`, `n_estimators=200` |
+| DecisionTreeRegressor | 1163.660066 | 0.983855 | `criterion='poisson'`, `max_depth=16`, `min_samples_split=2`, `splitter='best'` |
+| RandomForest | 2315.150297 | 0.967408 | `max_depth=None`, `max_features='sqrt'`, `min_samples_leaf=1`, `min_samples_split=2`, `n_estimators=500` |
+
+Overall takeaway:
+
+- Gradient boosting remained the most reliable model after tuning and is the recommended choice for prediction in this project.
+- The tuning step did not improve on the notebook's earlier untuned test-set results for random forest or decision tree, which suggests the original gradient boosting configuration was already close to optimal for this dataset.
+- From a business perspective, workout intensity and duration matter more than purely demographic fields, so gyms and fitness apps can use these variables to estimate calorie burn and personalize workout recommendations.
+
 
 #### Next steps
 
-- Perform hyperparameter tuning (GridSearchCV or RandomizedSearchCV) for top models.
 - Use k-fold cross-validation (with more folds) and report confidence intervals for metrics.
 - Try more advanced models (e.g., `HistGradientBoostingRegressor`, XGBoost, LightGBM) and ensembling.
 - Calibrate and validate the model on an external dataset if available.
